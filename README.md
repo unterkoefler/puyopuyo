@@ -10,8 +10,9 @@ Game instructions are below. Feel free to comment or contribute with suggestions
 Game Instructions:
 
 Starting the Game:
-1. Simply run the program, or
-2. Enter the following into the interactions window: (play-puyo blank-world)
+1. Run the program
+2. Enter the following into the interactions window: (play 0)
+3. To play again, enter (play 0) or use the shortcut ESC p
 
 Objective: The objective of the game is to score the most possible points by creating blocks and chains of like-colored puyos. A block is 4 or more horizontally or vertically adjacent puyos, and a chain occurs when the removal of one block causes another block to form. Chains get you the most points!
 
