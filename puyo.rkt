@@ -3,13 +3,14 @@
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname puyo) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require 2htdp/image)
 (require 2htdp/universe)
+(require 2htdp/batch-io)
 
 ;------------------ Constants -----------------------------------
 
 (define CELL-SIZE 50)
 (define GRID-HEIGHT 12) ; in number of cells
 (define GRID-WIDTH 6)   ; in number of cells
-(define PLAY-SPEED 1)  ; in seconds/tick
+(define PLAY-SPEED .5)  ; in seconds/tick
 ; Beginner: 1, Intermediate: .5, Expert: .25
 (define FONT-SIZE 16);
 (define BACKGROUND-EMPTY (empty-scene (* CELL-SIZE GRID-WIDTH) (* CELL-SIZE GRID-HEIGHT)))
@@ -35,6 +36,8 @@
 
 (define FINAL-WORLD-IMG
   (overlay (text "GAME OVER" 20 "black") BACKGROUND-EMPTY))
+
+(define SCORE-FILE "scores.txt")
 
 ;------------------ Data Definitions ----------------------------
 
@@ -219,7 +222,7 @@
   (above (text (string-append "Score: " (number->string (score-curr scr))) FONT-SIZE "black")
          (text (string-append "Highest chain: "
                               (number->string (score-long-chain scr))) FONT-SIZE "black")
-         (text (string-append "High score: " (number->string (score-curr scr))) FONT-SIZE "black")))
+         (text (string-append "High score: " (number->string (score-high scr))) FONT-SIZE "black")))
 
 ; render-blocks : [List-of [List-of Puyo]] Image -> Image
 ; draws all the blocks in a distinct way
@@ -727,6 +730,21 @@
          (rot0-1 p lop (+ 1 count)))]
     [else p]))
 
+(define (world-score w)
+  (cond
+    ((world-g? w) (world-g-score w))
+    ((world-p? w) (world-p-score w))
+    ((world-s? w) (world-s-score w))
+    ((world-pop? w) (world-pop-score w))))
+    
 
 ; starts the game when program is run:
-(define play (play-puyo blank-world))
+(define (play x)
+  (write-file SCORE-FILE
+                         (number->string (score-high
+                          (world-score
+                           (play-puyo
+                            (make-world-g '()
+                                          (make-score 0 0 0
+                                                      (string->number
+                                                       (read-file SCORE-FILE))))))))))
